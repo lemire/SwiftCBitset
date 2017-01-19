@@ -1,6 +1,13 @@
 import cbitset
 import Swimsuit
 
+class Bitset { 
+        let ptr : UnsafeMutablePointer<bitset_s> 
+        init(bitset : Bitset) { self.ptr = cbitset.bitset_copy(bitset.ptr)!}
+        init() { self.ptr = cbitset.bitset_create()! } 
+        deinit { cbitset.bitset_free(self.ptr) } 
+        func set(i : Int) { cbitset.bitset_set(ptr,i) } 
+} 
 
 func create() {
     let b1 = cbitset.bitset_create()
