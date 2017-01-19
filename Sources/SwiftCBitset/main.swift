@@ -3,60 +3,59 @@ import Swimsuit
 
 
 func create() {
-    let b1 = cbitset.bitset_create()
-    // that's not the swift way, but whatever
-    var k : cbitset.size_t = 0
-    let maxk : cbitset.size_t = 100000000
-    while k < maxk {
-      cbitset.bitset_set(b1,k)
-      k+=100
+    let b1 = cbitset.bitset_create()!
+    for k in stride(from: 0, to: 100000000, by: 100 ) {
+       cbitset.bitset_set(b1,k)
     }
-    cbitset.bitset_free(b1)
+//    cbitset.bitset_free(b1)
 }
 
 func iterate(_ b1 : UnsafeMutablePointer<bitset_s>) -> Int {
   var sum = 0
   var i : cbitset.size_t = 0
   while cbitset.nextSetBit(b1,&i) {
-    i += 1
-    sum += 1
+    i = i &+ 1
+    sum = sum &+ 1
   }
   return sum;
 }
 
 
-for _ in 0...10 {
 
 var nano = Swimsuit.nanotime() {
-  create()
+}
+print("Empty ", Double(nano) / 1_000_000.0, " ms")
+
+nano = Swimsuit.nanotime() {
+  create() 
 }
 print("testAddPerformance ", Double(nano) / 1_000_000.0, " ms")
 
-    let b1 = cbitset.bitset_create()
-    // that's not the swift way, but whatever
-    var k : cbitset.size_t = 0
-    let maxk : cbitset.size_t = 100000000
-    while k < maxk {
-      cbitset.bitset_set(b1,k)
-      k+=100
-    }
-
-
+let b1 = cbitset.bitset_create()!
+var count = 0
+for k in stride(from: 0, to: 100000000, by: 100 ) {
+   cbitset.bitset_set(b1,k)
+   count += 1
+}
 
 
 nano = Swimsuit.nanotime() {
-  cbitset.bitset_count(b1!)
+  if cbitset.bitset_count(b1) != count {
+    print("bug")
+  }
 }
+
 print("testCountPerformance ", Double(nano) / 1_000_000.0, " ms")
 
 
 nano = Swimsuit.nanotime() {
-  iterate(b1!)
+  if iterate(b1) != count {
+    print("bug")
+  }
 }
+
 print("testIteratePerformance ", Double(nano) / 1_000_000.0, " ms")
 
 cbitset.bitset_free(b1)
 
 print()
-
-}
